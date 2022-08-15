@@ -1,7 +1,10 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
@@ -30,9 +33,27 @@ func initConfig() error {
 	return nil
 }
 
+func poll(ctx context.Context) error {
+	ticker := time.NewTicker(time.Duration(config.PollIntervalSeconds) * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-ticker.C:
+			fmt.Println("tick")
+		}
+	}
+}
+
 func main() {
 	err := initConfig()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "init config"))
+	}
+	ctx := context.Background()
+	err = poll(ctx)
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "poll"))
 	}
 }
