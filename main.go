@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -15,6 +14,7 @@ var config Config
 
 type Config struct {
 	PollIntervalSeconds int64
+	TetrioUserID        string
 }
 
 func initConfig() error {
@@ -41,7 +41,14 @@ func poll(ctx context.Context) error {
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
-			fmt.Println("tick")
+			log.Println("getting recent user streams")
+			parsedResponse, rawResponse, err := getTetrioRecentUserStreams(ctx, config.TetrioUserID)
+			if err != nil {
+				log.Println(errors.Wrap(err, "get tetrio recent user streams"))
+			}
+			_ = parsedResponse
+			_ = rawResponse
+			// TODO: save to DB
 		}
 	}
 }
