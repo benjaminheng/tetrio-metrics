@@ -42,7 +42,7 @@ func NewStore(config Config) (*Store, error) {
 
 func (s *Store) initTables() error {
 	stmt := `
-CREATE TABLE IF NOT EXISTS foo (
+CREATE TABLE IF NOT EXISTS gamemode_40l (
   id integer not null primary key,
   played_at timestamp,
   time double,
