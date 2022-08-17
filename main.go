@@ -33,7 +33,25 @@ func initConfig() error {
 	return nil
 }
 
+func checkForNewTetrioGames(ctx context.Context) (err error) {
+	log.Println("checking for recent tetrio games")
+	defer func() {
+		if err != nil {
+			log.Println(errors.Wrap(err, "error"))
+		}
+	}()
+	parsedResponse, rawResponse, err := getTetrioRecentUserStreams(ctx, config.TetrioUserID)
+	if err != nil {
+		return errors.Wrap(err, "get tetrio recent user streams")
+	}
+	_ = parsedResponse
+	_ = rawResponse
+	// TODO: save to DB
+	return nil
+}
+
 func poll(ctx context.Context) error {
+	checkForNewTetrioGames(ctx)
 	ticker := time.NewTicker(time.Duration(config.PollIntervalSeconds) * time.Second)
 	defer ticker.Stop()
 	for {
@@ -41,14 +59,7 @@ func poll(ctx context.Context) error {
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
-			log.Println("getting recent user streams")
-			parsedResponse, rawResponse, err := getTetrioRecentUserStreams(ctx, config.TetrioUserID)
-			if err != nil {
-				log.Println(errors.Wrap(err, "get tetrio recent user streams"))
-			}
-			_ = parsedResponse
-			_ = rawResponse
-			// TODO: save to DB
+			checkForNewTetrioGames(ctx)
 		}
 	}
 }
