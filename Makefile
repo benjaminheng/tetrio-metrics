@@ -6,3 +6,6 @@ new-migration:
 
 migrate-up:
 	migrate -source file://migrations/ -database sqlite3://data.db up
+
+install:
+	go install ./...
