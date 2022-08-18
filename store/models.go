@@ -10,11 +10,11 @@ import (
 )
 
 type Gamemode40l struct {
-	ID             int64
-	PlayedAt       time.Time
-	TimeMs         int64
-	FinessePercent float64
-	FinesseFaults  int64
-	TotalPieces    int64
-	RawData        sql.NullString
+	ID              int64
+	PlayedAt        time.Time
+	TimeMs          int64
+	FinessePercent  float64
+	TotalPieces     int64
+	PiecesPerSecond float64
+	RawData         sql.NullString
 }

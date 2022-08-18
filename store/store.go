@@ -9,6 +9,7 @@ import (
 
 type Store struct {
 	*Queries
+	db *sql.DB
 
 	config Config
 }
@@ -22,12 +23,12 @@ func NewStore(config Config) (*Store, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "open DB")
 	}
-	defer db.Close()
 	queries := New(db)
 
 	s := &Store{
 		config:  config,
 		Queries: queries,
+		db:      db,
 	}
 	return s, nil
 }

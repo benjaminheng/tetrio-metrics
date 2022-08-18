@@ -50,8 +50,25 @@ func (s *Service) checkForNewTetrioGames(ctx context.Context) (err error) {
 	if err != nil {
 		return errors.Wrap(err, "get tetrio recent user streams")
 	}
-	_ = parsedResponse
-	// TODO: save to DB
+	for _, record := range parsedResponse.Data.Records {
+		m, err := buildGamemode40LRecord(record)
+		if err != nil {
+			log.Println(errors.Wrap(err, "build gamemode_40l model"))
+		}
+		// TODO: insert only if it doesn't exist
+		log.Printf("saving game: ts=%v time=%vs\n", m.PlayedAt.Format(time.RFC3339Nano), float64(m.TimeMs)/1000.0)
+		_, err = s.store.InsertGamemode40L(ctx, store.InsertGamemode40LParams{
+			PlayedAt:        m.PlayedAt,
+			TimeMs:          m.TimeMs,
+			FinessePercent:  m.FinessePercent,
+			TotalPieces:     m.TotalPieces,
+			PiecesPerSecond: m.PiecesPerSecond,
+			RawData:         m.RawData,
+		})
+		if err != nil {
+			log.Println(errors.Wrap(err, "insert gamemode_40l record to DB"))
+		}
+	}
 	return nil
 }
 

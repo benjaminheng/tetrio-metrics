@@ -16,22 +16,22 @@ INSERT INTO gamemode_40l (
   played_at,
   time_ms,
   finesse_percent,
-  finesse_faults,
   total_pieces,
+  pieces_per_second,
   raw_data
 ) VALUES (
   ?, ?, ?, ?, ?, ?
 )
-RETURNING id, played_at, time_ms, finesse_percent, finesse_faults, total_pieces, raw_data
+RETURNING id, played_at, time_ms, finesse_percent, total_pieces, pieces_per_second, raw_data
 `
 
 type InsertGamemode40LParams struct {
-	PlayedAt       time.Time
-	TimeMs         int64
-	FinessePercent float64
-	FinesseFaults  int64
-	TotalPieces    int64
-	RawData        sql.NullString
+	PlayedAt        time.Time
+	TimeMs          int64
+	FinessePercent  float64
+	TotalPieces     int64
+	PiecesPerSecond float64
+	RawData         sql.NullString
 }
 
 func (q *Queries) InsertGamemode40L(ctx context.Context, arg InsertGamemode40LParams) (Gamemode40l, error) {
@@ -39,8 +39,8 @@ func (q *Queries) InsertGamemode40L(ctx context.Context, arg InsertGamemode40LPa
 		arg.PlayedAt,
 		arg.TimeMs,
 		arg.FinessePercent,
-		arg.FinesseFaults,
 		arg.TotalPieces,
+		arg.PiecesPerSecond,
 		arg.RawData,
 	)
 	var i Gamemode40l
@@ -49,8 +49,8 @@ func (q *Queries) InsertGamemode40L(ctx context.Context, arg InsertGamemode40LPa
 		&i.PlayedAt,
 		&i.TimeMs,
 		&i.FinessePercent,
-		&i.FinesseFaults,
 		&i.TotalPieces,
+		&i.PiecesPerSecond,
 		&i.RawData,
 	)
 	return i, err

@@ -98,20 +98,18 @@ func buildGamemode40LRecord(apiRecord TetrioStreamRecord) (record store.Gamemode
 		return record, errors.Wrap(err, "marshal tetrio stream record to json")
 	}
 	record.RawData.Scan(string(rawData))
-	// TODO: raw data is wrong
-	record.FinesseFaults = apiRecord.EndContext.Finesse.Faults
-	record.TotalPieces = apiRecord.EndContext.Finesse.Faults + apiRecord.EndContext.Finesse.PerfectPieces
-	finessePercent := 1 - (float64(record.FinesseFaults) / float64(record.TotalPieces))
+	record.TimeMs = int64(math.Round(apiRecord.EndContext.FinalTime))
+	record.TotalPieces = apiRecord.EndContext.PiecesPlaced
+	finessePercent := (float64(apiRecord.EndContext.Finesse.PerfectPieces) / float64(record.TotalPieces)) * 100
 	finessePercent = math.Round(finessePercent*100.0) / 100 // Round to 2 decimal places
 	record.FinessePercent = finessePercent
 	playedAt, err := time.Parse(time.RFC3339Nano, apiRecord.Timestamp)
 	if err != nil {
 		return record, errors.Wrap(err, "parse played_at to time.Time")
 	}
+	pps := (float64(record.TotalPieces) * 1000) / float64(record.TimeMs)
+	pps = math.Round(pps*100.0) / 100 // Round to 2 decimal places
+	record.PiecesPerSecond = pps
 	record.PlayedAt = playedAt
-	// Tetrio returns timings in granular to 1/3 of a millisecond. We'll
-	// just round the time down to the nearest millisecond for simplicity.
-	record.TimeMs = int64(apiRecord.EndContext.FinalTime)
-
 	return record, nil
 }

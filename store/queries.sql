@@ -3,8 +3,8 @@ INSERT INTO gamemode_40l (
   played_at,
   time_ms,
   finesse_percent,
-  finesse_faults,
   total_pieces,
+  pieces_per_second,
   raw_data
 ) VALUES (
   ?, ?, ?, ?, ?, ?
