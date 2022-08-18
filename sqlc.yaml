@@ -1,0 +1,7 @@
+version: 1
+packages:
+  - path: "store"
+    name: "store"
+    engine: "sqlite"
+    schema: "migrations/"
+    queries: "store/queries.sql"
