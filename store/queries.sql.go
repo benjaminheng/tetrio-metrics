@@ -14,7 +14,7 @@ import (
 const insertGamemode40L = `-- name: InsertGamemode40L :one
 INSERT INTO gamemode_40l (
   played_at,
-  time,
+  time_ms,
   finesse_percent,
   finesse_faults,
   total_pieces,
@@ -22,12 +22,12 @@ INSERT INTO gamemode_40l (
 ) VALUES (
   ?, ?, ?, ?, ?, ?
 )
-RETURNING id, played_at, time, finesse_percent, finesse_faults, total_pieces, raw_data
+RETURNING id, played_at, time_ms, finesse_percent, finesse_faults, total_pieces, raw_data
 `
 
 type InsertGamemode40LParams struct {
 	PlayedAt       time.Time
-	Time           float64
+	TimeMs         int64
 	FinessePercent float64
 	FinesseFaults  int64
 	TotalPieces    int64
@@ -37,7 +37,7 @@ type InsertGamemode40LParams struct {
 func (q *Queries) InsertGamemode40L(ctx context.Context, arg InsertGamemode40LParams) (Gamemode40l, error) {
 	row := q.db.QueryRowContext(ctx, insertGamemode40L,
 		arg.PlayedAt,
-		arg.Time,
+		arg.TimeMs,
 		arg.FinessePercent,
 		arg.FinesseFaults,
 		arg.TotalPieces,
@@ -47,7 +47,7 @@ func (q *Queries) InsertGamemode40L(ctx context.Context, arg InsertGamemode40LPa
 	err := row.Scan(
 		&i.ID,
 		&i.PlayedAt,
-		&i.Time,
+		&i.TimeMs,
 		&i.FinessePercent,
 		&i.FinesseFaults,
 		&i.TotalPieces,

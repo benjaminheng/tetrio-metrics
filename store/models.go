@@ -12,7 +12,7 @@ import (
 type Gamemode40l struct {
 	ID             int64
 	PlayedAt       time.Time
-	Time           float64
+	TimeMs         int64
 	FinessePercent float64
 	FinesseFaults  int64
 	TotalPieces    int64

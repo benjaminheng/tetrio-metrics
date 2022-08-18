@@ -1,7 +1,6 @@
 package store
 
 import (
-	"context"
 	"database/sql"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -9,8 +8,9 @@ import (
 )
 
 type Store struct {
-	config  Config
-	queries *Queries
+	*Queries
+
+	config Config
 }
 
 type Config struct {
@@ -27,11 +27,7 @@ func NewStore(config Config) (*Store, error) {
 
 	s := &Store{
 		config:  config,
-		queries: queries,
+		Queries: queries,
 	}
 	return s, nil
-}
-
-func (s *Store) Insert40LRecord(ctx context.Context, m *Gamemode40l) error {
-	return nil
 }

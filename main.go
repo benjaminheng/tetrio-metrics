@@ -46,12 +46,11 @@ func (s *Service) checkForNewTetrioGames(ctx context.Context) (err error) {
 			log.Println(errors.Wrap(err, "error"))
 		}
 	}()
-	parsedResponse, rawResponse, err := getTetrioRecentUserStreams(ctx, s.config.TetrioUserID)
+	parsedResponse, err := getTetrioRecentUserStreams(ctx, s.config.TetrioUserID)
 	if err != nil {
 		return errors.Wrap(err, "get tetrio recent user streams")
 	}
 	_ = parsedResponse
-	_ = rawResponse
 	// TODO: save to DB
 	return nil
 }
