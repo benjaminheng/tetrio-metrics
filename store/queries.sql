@@ -10,3 +10,9 @@ INSERT INTO gamemode_40l (
   ?, ?, ?, ?, ?, ?
 )
 RETURNING *;
+
+-- name: GetLatestGamemode40L :one
+SELECT played_at
+FROM gamemode_40l
+ORDER BY played_at DESC
+LIMIT 1

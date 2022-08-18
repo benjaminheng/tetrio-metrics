@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"time"
 
@@ -46,16 +47,33 @@ func (s *Service) checkForNewTetrioGames(ctx context.Context) (err error) {
 			log.Println(errors.Wrap(err, "error"))
 		}
 	}()
+
+	// Get recent games from tetrio
 	parsedResponse, err := getTetrioRecentUserStreams(ctx, s.config.TetrioUserID)
 	if err != nil {
 		return errors.Wrap(err, "get tetrio recent user streams")
 	}
-	for _, record := range parsedResponse.Data.Records {
-		m, err := buildGamemode40LRecord(record)
+
+	// Get the last inserted model
+	lastSeen, err := s.store.GetLatestGamemode40L(ctx)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return errors.Wrap(err, "get latest gamemode_40l record")
+	}
+
+	// Construct models from tetrio's API response
+	var modelsToInsert []store.Gamemode40l
+	for _, v := range parsedResponse.Data.Records {
+		m, err := buildGamemode40LRecord(v)
 		if err != nil {
 			log.Println(errors.Wrap(err, "build gamemode_40l model"))
 		}
-		// TODO: insert only if it doesn't exist
+		if m.PlayedAt.After(lastSeen) {
+			modelsToInsert = append(modelsToInsert, m)
+		}
+	}
+
+	// Insert models to DB
+	for _, m := range modelsToInsert {
 		log.Printf("saving game: ts=%v time=%vs\n", m.PlayedAt.Format(time.RFC3339Nano), float64(m.TimeMs)/1000.0)
 		_, err = s.store.InsertGamemode40L(ctx, store.InsertGamemode40LParams{
 			PlayedAt:        m.PlayedAt,

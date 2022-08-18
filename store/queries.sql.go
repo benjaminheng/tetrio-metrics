@@ -11,6 +11,20 @@ import (
 	"time"
 )
 
+const getLatestGamemode40L = `-- name: GetLatestGamemode40L :one
+SELECT played_at
+FROM gamemode_40l
+ORDER BY played_at DESC
+LIMIT 1
+`
+
+func (q *Queries) GetLatestGamemode40L(ctx context.Context) (time.Time, error) {
+	row := q.db.QueryRowContext(ctx, getLatestGamemode40L)
+	var played_at time.Time
+	err := row.Scan(&played_at)
+	return played_at, err
+}
+
 const insertGamemode40L = `-- name: InsertGamemode40L :one
 INSERT INTO gamemode_40l (
   played_at,
