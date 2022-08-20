@@ -63,6 +63,9 @@ func (s *Service) checkForNewTetrioGames(ctx context.Context) (err error) {
 	// Construct models from tetrio's API response
 	var modelsToInsert []store.Gamemode40l
 	for _, v := range parsedResponse.Data.Records {
+		if v.EndContext.GameType != "40l" {
+			continue
+		}
 		m, err := buildGamemode40LRecord(v)
 		if err != nil {
 			log.Println(errors.Wrap(err, "build gamemode_40l model"))
