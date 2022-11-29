@@ -70,8 +70,33 @@ type TetrioUserInfoResponse struct {
 	} `json:"data"`
 }
 
-func getTetrioUserInfo(ctx context.Context, userID string) (resp *TetrioUserInfoResponse, err error) {
-	return nil, nil
+func getTetrioUserInfo(ctx context.Context, userID string) (parsedResponse *TetrioUserInfoResponse, err error) {
+	url := "https://ch.tetr.io/api/users/" + userID
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "get request")
+	}
+	req.Header.Add("User-Agent", "Bot to archive my personal replays (repo: github.com/benjaminheng/tetrio-metrics)")
+
+	client := &http.Client{
+		Timeout: 3000 * time.Millisecond,
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "call tetrio api")
+	}
+	defer resp.Body.Close()
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "read body")
+	}
+	parsedResponse = &TetrioUserInfoResponse{}
+	err = json.Unmarshal(b, parsedResponse)
+	if err != nil {
+		return nil, errors.Wrap(err, "unmarshal parsed response")
+	}
+	return parsedResponse, nil
 }
 
 func getTetrioRecentUserStreams(ctx context.Context, userID string) (parsedResponse *TetrioStreamResponse, err error) {
