@@ -69,3 +69,84 @@ func (q *Queries) InsertGamemode40L(ctx context.Context, arg InsertGamemode40LPa
 	)
 	return i, err
 }
+
+const insertUserInfo = `-- name: InsertUserInfo :one
+INSERT INTO user_info (
+  created_at,
+  total_played_seconds,
+  league_games_played,
+  league_games_won,
+  league_rating,
+  league_glicko,
+  league_glicko_rd,
+  league_rank,
+  league_best_rank,
+  league_apm,
+  league_pps,
+  league_vs,
+  league_percentile,
+  league_global_standing,
+  league_local_standing
+) VALUES (
+  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+)
+RETURNING id, created_at, total_played_seconds, league_games_played, league_games_won, league_rating, league_glicko, league_glicko_rd, league_rank, league_best_rank, league_apm, league_pps, league_vs, league_percentile, league_global_standing, league_local_standing
+`
+
+type InsertUserInfoParams struct {
+	CreatedAt            time.Time
+	TotalPlayedSeconds   int64
+	LeagueGamesPlayed    int64
+	LeagueGamesWon       int64
+	LeagueRating         float64
+	LeagueGlicko         float64
+	LeagueGlickoRd       float64
+	LeagueRank           string
+	LeagueBestRank       string
+	LeagueApm            float64
+	LeaguePps            float64
+	LeagueVs             float64
+	LeaguePercentile     float64
+	LeagueGlobalStanding float64
+	LeagueLocalStanding  float64
+}
+
+func (q *Queries) InsertUserInfo(ctx context.Context, arg InsertUserInfoParams) (UserInfo, error) {
+	row := q.db.QueryRowContext(ctx, insertUserInfo,
+		arg.CreatedAt,
+		arg.TotalPlayedSeconds,
+		arg.LeagueGamesPlayed,
+		arg.LeagueGamesWon,
+		arg.LeagueRating,
+		arg.LeagueGlicko,
+		arg.LeagueGlickoRd,
+		arg.LeagueRank,
+		arg.LeagueBestRank,
+		arg.LeagueApm,
+		arg.LeaguePps,
+		arg.LeagueVs,
+		arg.LeaguePercentile,
+		arg.LeagueGlobalStanding,
+		arg.LeagueLocalStanding,
+	)
+	var i UserInfo
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.TotalPlayedSeconds,
+		&i.LeagueGamesPlayed,
+		&i.LeagueGamesWon,
+		&i.LeagueRating,
+		&i.LeagueGlicko,
+		&i.LeagueGlickoRd,
+		&i.LeagueRank,
+		&i.LeagueBestRank,
+		&i.LeagueApm,
+		&i.LeaguePps,
+		&i.LeagueVs,
+		&i.LeaguePercentile,
+		&i.LeagueGlobalStanding,
+		&i.LeagueLocalStanding,
+	)
+	return i, err
+}

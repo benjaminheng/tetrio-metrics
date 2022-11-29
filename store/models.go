@@ -18,3 +18,22 @@ type Gamemode40l struct {
 	PiecesPerSecond float64
 	RawData         sql.NullString
 }
+
+type UserInfo struct {
+	ID                   int64
+	CreatedAt            time.Time
+	TotalPlayedSeconds   int64
+	LeagueGamesPlayed    int64
+	LeagueGamesWon       int64
+	LeagueRating         float64
+	LeagueGlicko         float64
+	LeagueGlickoRd       float64
+	LeagueRank           string
+	LeagueBestRank       string
+	LeagueApm            float64
+	LeaguePps            float64
+	LeagueVs             float64
+	LeaguePercentile     float64
+	LeagueGlobalStanding float64
+	LeagueLocalStanding  float64
+}
