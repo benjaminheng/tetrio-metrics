@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/benjaminheng/tetrio-metrics/store"
@@ -13,9 +14,10 @@ import (
 )
 
 type Config struct {
-	PollIntervalSeconds int64
-	TetrioUserID        string
-	DatabaseFilePath    string
+	PollIntervalSeconds         int64 // Poll interval for 40L game mode data
+	UserInfoPollIntervalSeconds int64 // Poll interval for user info
+	TetrioUserID                string
+	DatabaseFilePath            string
 }
 
 type Service struct {
@@ -40,7 +42,7 @@ func initConfig() (Config, error) {
 	return config, nil
 }
 
-func (s *Service) checkForNewTetrioGames(ctx context.Context) (err error) {
+func (s *Service) checkForNewTetrio40LGames(ctx context.Context) (err error) {
 	log.Println("checking for recent tetrio games")
 	defer func() {
 		if err != nil {
@@ -93,8 +95,8 @@ func (s *Service) checkForNewTetrioGames(ctx context.Context) (err error) {
 	return nil
 }
 
-func (s *Service) poll(ctx context.Context) error {
-	s.checkForNewTetrioGames(ctx)
+func (s *Service) poll40LGameMode(ctx context.Context) error {
+	s.checkForNewTetrio40LGames(ctx)
 	ticker := time.NewTicker(time.Duration(s.config.PollIntervalSeconds) * time.Second)
 	defer ticker.Stop()
 	for {
@@ -102,7 +104,20 @@ func (s *Service) poll(ctx context.Context) error {
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
-			s.checkForNewTetrioGames(ctx)
+			s.checkForNewTetrio40LGames(ctx)
+		}
+	}
+}
+
+func (s *Service) pollUserInfo(ctx context.Context) error {
+	ticker := time.NewTicker(time.Duration(s.config.UserInfoPollIntervalSeconds) * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-ticker.C:
+			// TODO
 		}
 	}
 }
@@ -134,8 +149,27 @@ func main() {
 	}
 
 	ctx := context.Background()
-	err = service.poll(ctx)
-	if err != nil {
-		log.Fatal(errors.Wrap(err, "poll"))
-	}
+	var wg sync.WaitGroup
+
+	// Poll for 40l game mode data
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = service.poll40LGameMode(ctx)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "poll 40l game mode"))
+		}
+	}()
+
+	// Poll for user info
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = service.pollUserInfo(ctx)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "poll user info"))
+		}
+	}()
+
+	wg.Wait()
 }

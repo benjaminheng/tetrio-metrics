@@ -1,4 +1,5 @@
 [main]
 PollIntervalSeconds=300
+UserInfoPollIntervalSeconds=3600
 TetrioUserID=""
 DatabaseFilePath="data.db"
