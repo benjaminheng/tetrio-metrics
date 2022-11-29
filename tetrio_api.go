@@ -44,6 +44,36 @@ type TetrioStreamRawResponse struct {
 	} `json:"data"`
 }
 
+type TetrioUserInfoResponse struct {
+	Success bool `json:"success"`
+	Data    struct {
+		ID        string  `json:"_id"`
+		Username  string  `json:"username"`
+		Timestamp string  `json:"ts"`
+		GameTime  float64 `json:"gametime"`
+		Country   string
+		League    struct {
+			GamesPlayed    int64   `json:"gamesplayed"`
+			GamesWon       int64   `json:"gameswon"`
+			Rating         float64 `json:"rating"`
+			Glicko         float64 `json:"glicko"`
+			GlickoRD       float64 `json:"rd"`
+			Rank           string  `json:"rank"`
+			BestRank       string  `json:"bestrank"`
+			APM            float64 `json:"apm"`
+			PPS            float64 `json:"pps"`
+			VS             float64 `json:"vs"`
+			Percentile     float64 `json:"percentile"`
+			GlobalStanding int64   `json:"standing"`
+			LocalStanding  int64   `json:"standing_local"`
+		} `json:"league"`
+	} `json:"data"`
+}
+
+func getTetrioUserInfo(ctx context.Context, userID string) (resp *TetrioUserInfoResponse, err error) {
+	return nil, nil
+}
+
 func getTetrioRecentUserStreams(ctx context.Context, userID string) (parsedResponse *TetrioStreamResponse, err error) {
 	// TODO: add retries
 	url := "https://ch.tetr.io/api/streams/any_userrecent_" + userID
