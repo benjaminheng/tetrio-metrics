@@ -14,7 +14,7 @@ import (
 
 type Config struct {
 	PollIntervalSeconds int64
-	TetrioUserID        string
+	TetrioUsername      string
 	DatabaseFilePath    string
 }
 
@@ -49,7 +49,7 @@ func (s *Service) checkForNewTetrioGames(ctx context.Context) (err error) {
 	}()
 
 	// Get recent games from tetrio
-	parsedResponse, err := getTetrioRecentUserStreams(ctx, s.config.TetrioUserID)
+	parsedResponse, err := getTetrioRecentUserStreams(ctx, s.config.TetrioUsername)
 	if err != nil {
 		return errors.Wrap(err, "get tetrio recent user streams")
 	}

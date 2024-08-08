@@ -22,7 +22,7 @@ performance over time.
 4. Initialize the configuration file
     ```bash
     $ cp config.toml.example config.toml
-    $ vim config.toml # update `TetrioUserID` to your user ID
+    $ vim config.toml # update `TetrioUsername` to your username
     ```
 5. Install tetrio-metrics
     ```bash
